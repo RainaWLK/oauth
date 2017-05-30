@@ -51,7 +51,7 @@ function startServer(){
 	
 	//web services
 	Dropbox.startCodeGrantServ(app);
-	Dropbox.startImplictGrantServ(app);
+	//Dropbox.startImplictGrantServ(app);
 
 	//static
 	app.use(express.static(path.join(__dirname, 'www')));
@@ -73,7 +73,17 @@ function main(){
 
 	startServer();
 
+/*{ state: 'ccc',
+  code: 'I-m8xaynEZAAAAAAAAAAKwkxdMzQpN4Oqp5dx1MyH5I' }*/
 
+	//test
+	/*auth_data = {
+		"access_token": "I-m8xaynEZAAAAAAAAAALK8DYIG5Z0IbM9xF2m_9y6twK2QdKW2KTbF-CoUa2zGw",
+		"token_type": "bearer",
+		"uid": "12345678",
+		"account_id": "dbid:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	}
+	getFileList();*/
 }
 
 main();

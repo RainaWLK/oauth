@@ -2,13 +2,13 @@ var path = require('path');
 var request = require("request");
 var encode = require('./encode.js');
 var Net = require('./net.js');
-import { dropbox_serect } from './secret.js';
+var Secrets = require('./secret.js');
 var LISTEN_PORT = 8012;
 
 var auth_data = null;
 
 var client_id = "ai5zimpteemtbca";
-var secret = dropbox_serect;
+var secret = Secrets.dropbox_serect;
 
 
 var serv_uri = "/1/dropbox/oauth2";
