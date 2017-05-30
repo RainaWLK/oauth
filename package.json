@@ -1,0 +1,25 @@
+{
+  "name": "oauth",
+  "version": "1.0.0",
+  "description": "my oauth test",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "request": "^2.81.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RainaWLK/oauth.git"
+  },
+  "author": "RainaWLK",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RainaWLK/oauth/issues"
+  },
+  "homepage": "https://github.com/RainaWLK/oauth#readme"
+}
