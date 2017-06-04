@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns= "http://www.w3c.org/1999/xhtml">
+<head>
+<title>classroom</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Type" content="text/css">
+<meta name="viewport" content="width=device-width">
+<link href="js/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<script type="text/javascript" charset="utf-8" src="js/jquery-2.1.4.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/bootstrap/js/bootstrap.min.js"></script>
+<script>
+$(document).ready(function(){
+
+	$("#dropboxBtn").on("click", function(){
+		var newWindow = window.open("","_blank");
+		do_oauth(newWindow);
+	});
+
+
+});
+
+function do_oauth(newWindow){
+	$.get("/1/dropbox/oauth2/implict").done(function(data){
+		var url = JSON.parse(data).url;
+		newWindow.location.href = url;
+	});
+	
+}
+
+</script>
+<style>
+body {
+	padding-top:20px;
+}
+
+button{
+	height:50px;
+	width: 200px;
+	margin-top:10px;
+	margin-bottom: 10px;
+}
+
+
+</style>
+</head>
+<body class="container">
+<button type="button" class="btn btn-default" id="dropboxBtn">Google</button>
+</body>

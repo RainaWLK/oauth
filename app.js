@@ -53,6 +53,12 @@ function startServer(){
 	Dropbox.startCodeGrantServ(app);
 	//Dropbox.startImplictGrantServ(app);
 
+  app.get('/code', (req, res) => {
+    console.log(req);
+    res.send("jumi");
+    res.end();
+  });
+
 	//static
 	app.use(express.static(path.join(__dirname, 'www')));
 	app.use(function(req, res){
