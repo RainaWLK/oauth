@@ -23,6 +23,9 @@ $(document).ready(function(){
     console.log(inputData);
 
     $("#access_token").html(inputData.access_token);
+    $("#id_token").html(inputData.id_token);
+
+    console.log(parseJwt(inputData.id_token));
 });
 
 function parseFragments(parsedUrl){
@@ -48,6 +51,12 @@ function do_oauth(newWindow){
 	
 }
 
+function parseJwt (token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace('-', '+').replace('_', '/');
+    return JSON.parse(window.atob(base64));
+};
+
 </script>
 <style>
 body {
@@ -67,4 +76,6 @@ button{
 <body class="container">
 <span>Access Token=</span>
 <div id="access_token"></div>
+<span>ID Token=</span>
+<div id="id_token"></div>
 </body>
