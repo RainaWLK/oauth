@@ -9,13 +9,34 @@
 <link href="js/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <script type="text/javascript" charset="utf-8" src="js/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="js/bootstrap/js/bootstrap.min.js"></script>
+<script src="./amazon-cognito-identity-js/dist/aws-cognito-sdk.min.js"></script>
+<script src="./amazon-cognito-identity-js/dist/amazon-cognito-identity.min.js"></script>
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.38.0.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/secret.js"></script>
+<script src="./js/bundle.js"></script>
 <script>
-$(document).ready(function(){
+  AWS.config.region = 'us-east-1'; // Region
+  AWSCognito.config.region = 'us-east-1';
+  
+  var poolData = {
+    UserPoolId : cognito_user_pool_id, // your user pool id here
+    ClientId : congito_client_id // your app client id here
+  };
+  var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+  var cognitoSignupUser;
+  var cognitoLoginUser = null;
 
-	/*$("#dropboxBtn").on("click", function(){
-		var newWindow = window.open("","_blank");
-		do_oauth(newWindow);
-	});*/
+
+$(document).ready(function(){
+    let id_token = receiveGoogleImplictOauth();
+
+    $("#awsLoginBtn").on("click", function(){
+        awsLogin(id_token);
+	});
+    
+});
+
+function receiveGoogleImplictOauth(){
     var parsedUrl = new URL(window.location.href);
     console.log(parsedUrl.hash);
 
@@ -26,8 +47,84 @@ $(document).ready(function(){
     $("#id_token").html(inputData.id_token);
 
     console.log(parseJwt(inputData.id_token));
-});
+    id_token = inputData.id_token;
+    return id_token;
+}
 
+function awsLogin(id_token) {
+
+     // Add the Google access token to the Cognito credentials login map.
+     /*AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: aws_identity_pool_id,
+        Logins: {
+           'accounts.google.com': id_token
+        }
+     });*/
+    var params = {
+        IdentityPoolId: aws_identity_pool_id, /* required */
+        AccountId: aws_account_id,
+        //CustomRoleArn: 'STRING_VALUE',
+        Logins: {
+            'accounts.google.com': id_token
+            /* '<IdentityProviderName>': ... */
+        }
+    };
+
+    var cognitoidentity = new AWS.CognitoIdentity();
+    //create identity
+    console.log("==getID==");
+    cognitoidentity.getId(params, function(err, data) {
+        console.log("==getID done==");
+        if (err){
+            console.log(err, err.stack); // an error occurred
+            return;
+        }
+        $("#identity_id").html(data.IdentityId);
+        
+        //aws login
+        var params2 = {
+            IdentityId: data.IdentityId, /* required */
+            //CustomRoleArn: 'STRING_VALUE',
+            Logins: {
+                'accounts.google.com': id_token
+                /* '<IdentityProviderName>': ... */
+            }
+        };
+
+        console.log("==getCredentialsForIdentity==");
+        cognitoidentity.getCredentialsForIdentity(params2, function(err, data) {
+            console.log("==getCredentialsForIdentity done==");
+            if (err) {
+                console.log(err, err.stack); // an error occurred
+            }
+            else {
+                console.log(data);
+                showCredentials(data);
+                sendToAPIGateway(data);
+            } 
+        });
+    });
+
+     // Obtain AWS credentials
+     /*AWS.config.credentials.get(function(err, data){
+        // Access AWS resources here.
+        alert("login success");
+        console.log(err);
+        console.log(data);
+     });*/
+}
+
+
+function showCredentials(data){
+    let result = "";
+
+    for(let key in data.Credentials){
+        result += "<div>"+key+"="+data.Credentials[key]+"</div>";
+    }
+    $("#aws_credential_div").html(result);
+}
+
+//utils
 function parseFragments(parsedUrl){
     let fragments = parsedUrl.hash.split('&');
     let result = {};
@@ -41,14 +138,6 @@ function parseFragments(parsedUrl){
     }
 
     return result;
-}
-
-function do_oauth(newWindow){
-	$.get("/1/dropbox/oauth2/implict").done(function(data){
-		var url = JSON.parse(data).url;
-		newWindow.location.href = url;
-	});
-	
 }
 
 function parseJwt (token) {
@@ -74,8 +163,18 @@ button{
 </style>
 </head>
 <body class="container">
+
 <span>Access Token=</span>
 <div id="access_token"></div>
 <span>ID Token=</span>
 <div id="id_token"></div>
+
+<div id="aws_login_div">
+  <button class="btn btn-default" id="awsLoginBtn">AWS Login</button>
+  <div>Identity ID=<span id="identity_id"></span><div>
+</div>
+
+<div id="aws_credential_div">
+</div>
+
 </body>

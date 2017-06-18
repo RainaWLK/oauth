@@ -1,14 +1,14 @@
 var path = require('path');
 var request = require("request");
-var encode = require('./encode.js');
-var Net = require('./net.js');
-var Secrets = require('./secret.js');
+var encode = require('./utils/encode.js');
+//var Net = require('./utils/net.js');
+//var Secrets = require('./secret.js');
 var LISTEN_PORT = 8012;
 
 var auth_data = null;
 
 var client_id = "ai5zimpteemtbca";
-var secret = Secrets.dropbox_serect;
+//var secret = Secrets.google_serect;
 
 
 var serv_uri = "/1/dropbox/oauth2";
@@ -69,15 +69,6 @@ function accessToken(query){
 	});
 }
 
-function getAuthToken(){
-
-	if((typeof auth_data == 'object') && (auth_data.access_token != 'undefined')){
-		return auth_data.access_token;
-	}
-
-	return null;
-}
-
 function doCodeGrantAuth(res){
 	var time = Date.now();
 
@@ -123,7 +114,13 @@ function startCodeGrantServ(app){
 	});
 }
 
+function startImplictServ(app){
+  app.get('/code', (req, res) => {
+    res.sendFile(path.join(__dirname, 'www/google_res.html'));
+  });
+}
 
+
+exports.startImplictServ = startImplictServ;
 exports.startCodeGrantServ = startCodeGrantServ;
-//exports.doCodeGrantAuth = doCodeGrantAuth;
-//exports.getAuthToken = getAuthToken;
+//exports.startImplictServ;

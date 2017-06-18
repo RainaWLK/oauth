@@ -1,7 +1,7 @@
 var path = require('path');
 var request = require("request");
-var encode = require('./encode.js');
-var Net = require('./net.js');
+var encode = require('./utils/encode.js');
+var Net = require('./utils/net.js');
 var Secrets = require('./secret.js');
 var LISTEN_PORT = 8012;
 

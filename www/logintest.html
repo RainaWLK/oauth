@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AWS Cognito + Basic Login JavaScript Example</title>
+  <meta charset="UTF-8">
+</head>
+<script src="./amazon-cognito-identity-js/dist/aws-cognito-sdk.min.js"></script>
+<script src="./amazon-cognito-identity-js/dist/amazon-cognito-identity.min.js"></script>
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.38.0.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="js/secret.js"></script>
+<script>
+
+  $(document).ready(function() {
+      console.log( "ready!" );
+      var googletoken = getUrlParameter('access_token');
+      
+      if(typeof googletoken != 'undefined'){
+        console.log(googletoken);
+        signinCallback(googletoken);
+      }
+  });
+
+
+  AWSCognito.config.region = 'us-east-1';
+  
+  var poolData = {
+    UserPoolId : cognito_user_pool_id, // your user pool id here
+    ClientId :  congito_client_id// your app client id here
+  };
+  var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+  var cognitoSignupUser;
+  var cognitoLoginUser = null;
+
+  function signUp() {
+    var attributeList = [];
+
+    var username = document.getElementById("signup_username").value;
+    var password = document.getElementById("signup_password").value;
+    var email = document.getElementById("signup_email").value;
+
+    var signupData = [
+      {
+        Name : 'name',
+        Value : username // your name here
+      },
+      {
+        Name : 'email',
+        Value : email // your email here
+      },
+      {
+        Name : 'phone_number',
+        Value : '+14325551212' // your phone number here with +country code and no delimiters in front
+      }
+    ];
+
+    signupData.map(data => {
+      var attribute = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(data);
+      attributeList.push(attribute);
+    });
+
+    userPool.signUp(username, password, attributeList, null, function(err, result){
+      if (err) {
+          alert(err);
+          return;
+      }
+      cognitoSignupUser = result.user;
+      console.log('user name is ' + cognitoSignupUser.getUsername());
+      alert(cognitoSignupUser.getUsername() + " Sign Up Success");
+    });
+  }
+  
+  function verify(){
+    var code = document.getElementById("verificateCode").value;
+    console.log(code);
+
+    cognitoSignupUser.confirmRegistration(code, true, function(err, result) {
+      if (err) {
+          alert(err);
+          return;
+      }
+      console.log('call result: ' + result);
+      alert(result);
+    });
+  }
+
+  function signIn() {
+    var username = document.getElementById("username").value;
+    var password = document.getElementById("password").value;
+
+    var userData = {
+        Username : username, // your username here
+        Pool : userPool
+    };
+
+    var authenticationData = {
+        Username : username, // your username here
+        Password : password, // your password here
+    };
+    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
+ 
+    cognitoLoginUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+    cognitoLoginUser.authenticateUser(authenticationDetails, {
+      onSuccess: function (result) {
+          console.log('access token + ' + result.getAccessToken().getJwtToken());
+          document.getElementById("accessToken").innerHTML = "Access Token = " + result.getAccessToken().getJwtToken();
+          console.log('idToken + ' + result.idToken.jwtToken);
+          document.getElementById("idToken").innerHTML = "ID Token = " + result.idToken.jwtToken;
+      },
+
+      onFailure: function(err) {
+          alert(err);
+      },
+      mfaRequired: function(codeDeliveryDetails) {
+          var verificationCode = prompt('Please input verification code' ,'');
+          cognitoLoginUser.sendMFACode(verificationCode, this);
+      }
+    });
+  }
+
+  function callResource(){
+
+  }
+
+  function deleteUser() {
+    if(cognitoLoginUser == null)
+      return;
+
+    cognitoLoginUser.deleteUser(function(err, result) {
+        if (err) {
+            alert(err);
+            return;
+        }
+        console.log('call result: ' + result);
+        alert(result);
+    });    
+  }
+
+
+  /*
+ * Create form to request access token from Google's OAuth 2.0 server.
+ */
+function oauthSignIn() {
+  // Google's OAuth 2.0 endpoint for requesting an access token
+  var oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
+
+  // Create <form> element to submit parameters to OAuth 2.0 endpoint.
+  var form = document.createElement('form');
+  form.setAttribute('method', 'GET'); // Send as a GET request.
+  form.setAttribute('action', oauth2Endpoint);
+
+  // Parameters to pass to OAuth 2.0 endpoint.
+  var params = {'client_id': '167755153886-o7qrcglr58l7vakh8sr0iqn2ua9gg52a.apps.googleusercontent.com',
+                'redirect_uri': 'http://127.0.0.1:8081',
+                'response_type': 'token',
+                'scope': 'https://www.googleapis.com/auth/drive.metadata.readonly',
+                'include_granted_scopes': 'true',
+                'state': 'pass-through value'};
+
+  // Add form parameters as hidden input values.
+  for (var p in params) {
+    var input = document.createElement('input');
+    input.setAttribute('type', 'hidden');
+    input.setAttribute('name', p);
+    input.setAttribute('value', params[p]);
+    form.appendChild(input);
+  }
+
+  // Add form to page and submit it to open the OAuth 2.0 endpoint.
+  document.body.appendChild(form);
+  form.submit();
+}
+
+function signinCallback(authResult) {
+  //if (authResult['status']['signed_in']) {
+
+     // Add the Google access token to the Cognito credentials login map.
+     AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: 'IDENTITY_POOL_ID',
+        Logins: {
+           'accounts.google.com': authResult
+        }
+     });
+
+     // Obtain AWS credentials
+     AWS.config.credentials.get(function(){
+        // Access AWS resources here.
+        alert("login success");
+     });
+  //}
+}
+
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.hash.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};
+
+</script>
+
+<body>
+  <!--<fb:login-button scope="public_profile,email" onlogin="FB.getLoginStatus(statusChangeCallback);"></fb:login-button>-->
+  
+  <div>step1: sign up</div>
+  <label for="signup_username">Username: </label><input id="signup_username" type="text"></input>
+  <label for="signup_password">Password: </label><input id="signup_password" type="text"></input>
+  <label for="signup_email">E-Mail: </label><input id="signup_email" type="text"></input>
+  <button onClick="signUp()">Sign Up</button>
+  <p>
+  <div>step2: email verify</div>
+  <label for="verificateCode">verify Code: </label><input id="verificateCode" type="text"></input>
+  <button onClick="verify()">Verify</button>
+  <p>
+  <div>step3: singn in</div>
+  <label for="username">Username: </label><input id="username" type="text"></input>
+  <label for="password">Password: </label><input id="password" type="text"></input><br>
+  <button onClick="signIn()">Sign In</button>
+  <p>
+  <div>step4: use resources</div>
+  <label for="api">API: </label><input id="api" type="text" style="width:500px"></input>
+  <br><button onClick="callResource()">Call</button>
+  <p>
+  <button onClick="deleteUser()">deleteUser</button>
+
+  <p>
+  <button onClick="oauthSignIn()">Google OAuth</button>
+  <div>Information:</div>
+  <div id="accessToken"></div>
+  <div id="idToken"></div>
+</body>
+</html>

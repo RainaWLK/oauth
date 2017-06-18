@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns= "http://www.w3c.org/1999/xhtml">
 <head>
-<title>classroom</title>
+<title>oauth</title>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Type" content="text/css">
@@ -9,98 +9,22 @@
 <link href="js/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <script type="text/javascript" charset="utf-8" src="js/jquery-2.1.4.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="js/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/google_implict.js"></script>
 <script>
 $(document).ready(function(){
 
-	$("#dropboxBtn").on("click", function(){
-		var newWindow = window.open("","_blank");
-		do_oauth(newWindow);
-	});
+	//$("#dropboxBtn").on("click", function(){
+	//	var newWindow = window.open("","_blank");
+	//	do_oauth(newWindow);
+	//});
 
 	$("#googleBtn").on("click", function(){
-		//var newWindow = window.open("","_blank");
-		googleImplictOauthSignIn();
+		var newWindow = window.open("","_blank");
+		sendImplictRequest(newWindow);
     //googleCodeGrant();
 	});
 
 });
-
-function do_oauth(newWindow){
-	$.get("/1/dropbox/oauth2/implict").done(function(data){
-		var url = JSON.parse(data).url;
-		newWindow.location.href = url;
-	});
-	
-}
-
-
-
-/*
- * Create form to request access token from Google's OAuth 2.0 server.
- */
-function googleImplictOauthSignIn() {
-  // Google's OAuth 2.0 endpoint for requesting an access token
-  var oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
-
-  // Create <form> element to submit parameters to OAuth 2.0 endpoint.
-  var form = document.createElement('form');
-  form.setAttribute('method', 'GET'); // Send as a GET request.
-  form.setAttribute('action', oauth2Endpoint);
-
-  // Parameters to pass to OAuth 2.0 endpoint.
-  var params = {'client_id': '167755153886-o7qrcglr58l7vakh8sr0iqn2ua9gg52a.apps.googleusercontent.com',
-                //'redirect_uri': 'http://ec2-34-195-142-234.compute-1.amazonaws.com:8012/code',
-                'redirect_uri': 'http://127.0.0.1:8012/code',
-                'response_type': 'id_token token',
-                'scope': 'openid profile',
-                'include_granted_scopes': 'true',
-                'state': 'pass-through value',
-                'nonce': 'n-0S6_WzA2Mj'};
-
-  // Add form parameters as hidden input values.
-  for (var p in params) {
-    var input = document.createElement('input');
-    input.setAttribute('type', 'hidden');
-    input.setAttribute('name', p);
-    input.setAttribute('value', params[p]);
-    form.appendChild(input);
-  }
-
-  // Add form to page and submit it to open the OAuth 2.0 endpoint.
-  document.body.appendChild(form);
-  form.submit();
-}
-
-function googleCodeGrant() {
-  // Google's OAuth 2.0 endpoint for requesting an access token
-  var oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
-
-  // Create <form> element to submit parameters to OAuth 2.0 endpoint.
-  var form = document.createElement('form');
-  form.setAttribute('method', 'GET'); // Send as a GET request.
-  form.setAttribute('action', oauth2Endpoint);
-
-  // Parameters to pass to OAuth 2.0 endpoint.
-  var params = {'client_id': '167755153886-o7qrcglr58l7vakh8sr0iqn2ua9gg52a.apps.googleusercontent.com',
-                'redirect_uri': 'http://ec2-34-195-142-234.compute-1.amazonaws.com:8012/code',
-                'response_type': 'code',
-                'scope': 'openid email',
-                'include_granted_scopes': 'true',
-                'state': 'pass-through value'};
-
-  // Add form parameters as hidden input values.
-  for (var p in params) {
-    var input = document.createElement('input');
-    input.setAttribute('type', 'hidden');
-    input.setAttribute('name', p);
-    input.setAttribute('value', params[p]);
-    form.appendChild(input);
-  }
-
-  // Add form to page and submit it to open the OAuth 2.0 endpoint.
-  document.body.appendChild(form);
-  form.submit();
-}
 
 </script>
 <style>
@@ -119,6 +43,11 @@ button{
 </style>
 </head>
 <body class="container">
-<button type="button" class="btn btn-default" id="dropboxBtn">Dropbox</button>
-<button type="button" class="btn btn-default" id="googleBtn">Google</button>
+
+  <p>
+  <button class="btn btn-default" id="googleBtn">Google OAuth</button>
+  <div>Information:</div>
+  <div id="accessToken"></div>
+  <div id="idToken"></div>
+
 </body>

@@ -4,6 +4,7 @@
   "description": "my oauth test",
   "main": "app.js",
   "dependencies": {
+    "aws-api-gateway-client": "^0.2.7",
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "request": "^2.81.0"
