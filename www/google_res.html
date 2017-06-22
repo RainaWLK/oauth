@@ -71,6 +71,9 @@ function cognitoLogin(id_token) {
         //alert("login success");
         console.log(err);
         console.log(AWS.config.credentials);
+
+        showCredentials(AWS.config.credentials.data);
+        sendToAPIGateway(AWS.config.credentials.data);
     });
 }
 
@@ -133,6 +136,7 @@ function showCredentials(data){
         result += "<div>"+key+"="+data.Credentials[key]+"</div>";
     }
     $("#aws_credential_div").html(result);
+    $("#identity_id").html(data.IdentityId);
 }
 
 //utils
@@ -184,8 +188,14 @@ button{
   <button class="btn btn-default" id="awsLoginBtn">AWS Login</button>
   <div>Identity ID=<span id="identity_id"></span><div>
 </div>
+<hr>
 
 <div id="aws_credential_div">
+</div>
+
+<hr>
+
+<div id="rest_result">
 </div>
 
 </body>

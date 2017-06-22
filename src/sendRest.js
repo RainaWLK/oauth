@@ -1,7 +1,7 @@
- let apigClientFactory = require('aws-api-gateway-client').default;
+let apigClientFactory = require('aws-api-gateway-client').default;
 let secrets = require('./secrets');
 
-window.sendToAPIGateway = function(data){
+function sendToAPIGateway(data){
     console.log(data.Credentials);
     let credentials = {
         invokeUrl: secrets.aws_api_url,
@@ -9,6 +9,7 @@ window.sendToAPIGateway = function(data){
         secretKey: data.Credentials.SecretKey,
         sessionToken: data.Credentials.SessionToken
     };
+    console.log(apigClientFactory);
     var apigClient = apigClientFactory.newClient(credentials);
 
     var pathTemplate = '/restaurants';
@@ -41,3 +42,4 @@ window.sendToAPIGateway = function(data){
 
 //var qq = sendToAPIGateway;
 console.log("qq");
+exports.sendToAPIGateway = sendToAPIGateway;

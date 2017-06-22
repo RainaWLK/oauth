@@ -4,11 +4,13 @@
   <title>AWS Cognito + Basic Login JavaScript Example</title>
   <meta charset="UTF-8">
 </head>
+<link href="js/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <script src="./amazon-cognito-identity-js/dist/aws-cognito-sdk.min.js"></script>
 <script src="./amazon-cognito-identity-js/dist/amazon-cognito-identity.min.js"></script>
 <script src="https://sdk.amazonaws.com/js/aws-sdk-2.38.0.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="js/secret.js"></script>
+<script src="./js/bundle.js"></script>
 <script>
 
   $(document).ready(function() {
@@ -19,6 +21,11 @@
         console.log(googletoken);
         signinCallback(googletoken);
       }
+
+      $("#awsLoginBtn").on("click", function(){
+        //awsLogin(id_token);
+        signIn();
+	    });
   });
 
 
@@ -28,7 +35,8 @@
     UserPoolId : cognito_user_pool_id, // your user pool id here
     ClientId :  congito_client_id// your app client id here
   };
-  var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+  console.log(poolData);
+  
   var cognitoSignupUser;
   var cognitoLoginUser = null;
 
@@ -59,6 +67,8 @@
       attributeList.push(attribute);
     });
 
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+
     userPool.signUp(username, password, attributeList, null, function(err, result){
       if (err) {
           alert(err);
@@ -71,10 +81,19 @@
   }
   
   function verify(){
-    var code = document.getElementById("verificateCode").value;
+    var username = document.getElementById("verificate_username").value;
+    var code = document.getElementById("verificate_code").value;
+    console.log(username);
     console.log(code);
 
-    cognitoSignupUser.confirmRegistration(code, true, function(err, result) {
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+    var userData = {
+        Username : username,
+        Pool : userPool
+    };
+    var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+
+    cognitoUser.confirmRegistration(code, true, function(err, result) {
       if (err) {
           alert(err);
           return;
@@ -85,8 +104,11 @@
   }
 
   function signIn() {
+    console.log("signin");
     var username = document.getElementById("username").value;
     var password = document.getElementById("password").value;
+
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
 
     var userData = {
         Username : username, // your username here
@@ -102,10 +124,35 @@
     cognitoLoginUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
     cognitoLoginUser.authenticateUser(authenticationDetails, {
       onSuccess: function (result) {
+        console.log(result);
           console.log('access token + ' + result.getAccessToken().getJwtToken());
           document.getElementById("accessToken").innerHTML = "Access Token = " + result.getAccessToken().getJwtToken();
           console.log('idToken + ' + result.idToken.jwtToken);
           document.getElementById("idToken").innerHTML = "ID Token = " + result.idToken.jwtToken;
+
+          //integrate into federate indentity pool
+          AWS.config.region = 'us-east-1';
+          let idp = 'cognito-idp.us-east-1.amazonaws.com/'+ cognito_user_pool_id;
+          let logins = {};
+          logins[idp] = result.getIdToken().getJwtToken();
+
+          console.log(logins);
+
+          AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                IdentityPoolId : aws_identity_pool_id,
+                Logins : logins
+          });
+
+          AWS.config.credentials.refresh((error) => {
+            if (error) {
+                console.error(error);
+            } else {
+                console.log('Successfully logged!');
+                console.log(AWS.config.credentials);
+                showCredentials(AWS.config.credentials.data);
+                sendToAPIGateway(AWS.config.credentials.data);
+            }
+          });
       },
 
       onFailure: function(err) {
@@ -116,6 +163,38 @@
           cognitoLoginUser.sendMFACode(verificationCode, this);
       }
     });
+  }
+
+  function confirmPassword(){
+    var username = document.getElementById("reset_username").value;
+    var newPassword = document.getElementById("reset_newpassword").value;
+    var code = document.getElementById("reset_code").value;
+
+    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+    var userData = {
+        Username : username,
+        Pool : userPool
+    };
+    var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+    cognitoUser.confirmPassword(code, newPassword, {
+      onFailure(err) {
+        console.log(err);
+      },
+      onSuccess() {
+        console.log("success");
+      }
+    });
+  }
+
+  function showCredentials(data){
+    let result = "";
+
+    for(let key in data.Credentials){
+        result += "<div>"+key+"="+data.Credentials[key]+"</div>";
+    }
+    $("#aws_credential_div").html(result);
+
+    $("#identity_id").html(data.IdentityId);
   }
 
   function callResource(){
@@ -217,24 +296,41 @@ var getUrlParameter = function getUrlParameter(sParam) {
   <button onClick="signUp()">Sign Up</button>
   <p>
   <div>step2: email verify</div>
-  <label for="verificateCode">verify Code: </label><input id="verificateCode" type="text"></input>
+  <label for="verificate_username">Username: </label><input id="verificate_username" type="text"></input>
+  <label for="verificate_code">verify Code: </label><input id="verificate_code" type="text"></input>
   <button onClick="verify()">Verify</button>
   <p>
-  <div>step3: singn in</div>
-  <label for="username">Username: </label><input id="username" type="text"></input>
-  <label for="password">Password: </label><input id="password" type="text"></input><br>
-  <button onClick="signIn()">Sign In</button>
+  <div id="aws_login_div">
+    <div>step3: singn in</div>
+    <label for="username">Username: </label><input id="username" type="text"></input>
+    <label for="password">Password: </label><input id="password" type="text"></input>
+    <button class="btn btn-default" id="awsLoginBtn">AWS Login</button>
+    <div>Identity ID=<span id="identity_id"></span><div>
+  </div>
+
+  <p>
+  <div>step3.5: confirm password</div>
+  <label for="reset_username">Username: </label><input id="reset_username" type="text"></input>
+  <label for="reset_newpassword">New Password: </label><input id="reset_newpassword" type="text"></input>
+  <label for="reset_code">verify Code: </label><input id="reset_code" type="text"></input>
+  <button onClick="confirmPassword()">confirmPassword</button>
   <p>
   <div>step4: use resources</div>
   <label for="api">API: </label><input id="api" type="text" style="width:500px"></input>
-  <br><button onClick="callResource()">Call</button>
+  <button onClick="callResource()">Call</button>
   <p>
   <button onClick="deleteUser()">deleteUser</button>
 
   <p>
-  <button onClick="oauthSignIn()">Google OAuth</button>
+  <!--<button onClick="oauthSignIn()">Google OAuth</button>-->
+  <hr>
   <div>Information:</div>
   <div id="accessToken"></div>
   <div id="idToken"></div>
+
+
+  <hr>
+  <div id="aws_credential_div">
+  </div>
 </body>
 </html>
