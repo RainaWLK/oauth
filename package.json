@@ -15,12 +15,14 @@
   },
   "devDependencies": {
     "json-loader": "^0.5.4",
-    "webpack": "^3.0.0"
+    "webpack": "^3.0.0",
+    "webpack-dev-server": "^2.5.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
-    "start": "node app.js"
+    "watch": "webpack --progress --watch",
+    "start": "webpack-dev-server --open"
   },
   "repository": {
     "type": "git",

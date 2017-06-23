@@ -2,6 +2,7 @@ import $ from 'jquery';
 import AWS from 'aws-sdk';
 var AWSCognito = require('amazon-cognito-identity-js');
 let Secrets = require('./secret').Secrets;
+let SendRest = require('./sendRest');
 
 $(document).ready(function() {
     console.log( "ready!" );
@@ -12,13 +13,32 @@ $(document).ready(function() {
       signinCallback(googletoken);
     }
 
+    $("#awsSignupBtn").on("click", function(){
+      //awsLogin(id_token);
+      signUp();
+    });
+
+    $("#awsVerifyBtn").on("click", function(){
+      //awsLogin(id_token);
+      verify();
+    });
+
+    $("#awsForgetBtn").on("click", function(){
+      //awsLogin(id_token);
+      confirmPassword();
+    });
+
     $("#awsLoginBtn").on("click", function(){
       //awsLogin(id_token);
       signIn();
     });
+
+    $("#googleOauthBtn").on("click", function(){
+
+    });
 });
 
-//console.log(AWSCognito);
+console.log(AWSCognito);
 //AWSCognito.config.region = 'us-east-1';
   
   var poolData = {
@@ -53,11 +73,11 @@ $(document).ready(function() {
     ];
 
     signupData.map(data => {
-      var attribute = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(data);
+      var attribute = new AWSCognito.CognitoUserAttribute(data);
       attributeList.push(attribute);
     });
 
-    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+    var userPool = new AWSCognito.CognitoUserPool(poolData);
 
     userPool.signUp(username, password, attributeList, null, function(err, result){
       if (err) {
@@ -76,12 +96,12 @@ $(document).ready(function() {
     console.log(username);
     console.log(code);
 
-    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+    var userPool = new AWSCognito.CognitoUserPool(poolData);
     var userData = {
         Username : username,
         Pool : userPool
     };
-    var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+    var cognitoUser = new AWSCognito.CognitoUser(userData);
 
     cognitoUser.confirmRegistration(code, true, function(err, result) {
       if (err) {
@@ -98,7 +118,7 @@ $(document).ready(function() {
     var username = document.getElementById("username").value;
     var password = document.getElementById("password").value;
 
-    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+    var userPool = new AWSCognito.CognitoUserPool(poolData);
 
     var userData = {
         Username : username, // your username here
@@ -109,9 +129,9 @@ $(document).ready(function() {
         Username : username, // your username here
         Password : password, // your password here
     };
-    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
+    var authenticationDetails = new AWSCognito.AuthenticationDetails(authenticationData);
  
-    cognitoLoginUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+    cognitoLoginUser = new AWSCognito.CognitoUser(userData);
     cognitoLoginUser.authenticateUser(authenticationDetails, {
       onSuccess: function (result) {
           console.log('access token + ' + result.getAccessToken().getJwtToken());
@@ -128,7 +148,7 @@ $(document).ready(function() {
           console.log(logins);
 
           AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-                IdentityPoolId : aws_identity_pool_id,
+                IdentityPoolId : Secrets.aws_identity_pool_id,
                 Logins : logins
           });
 
@@ -139,7 +159,7 @@ $(document).ready(function() {
                 console.log('Successfully logged!');
                 console.log(AWS.config.credentials);
                 showCredentials(AWS.config.credentials.data);
-                sendToAPIGateway(AWS.config.credentials.data);
+                SendRest.sendToAPIGateway(AWS.config.credentials.data);
             }
           });
       },
@@ -159,12 +179,12 @@ $(document).ready(function() {
     var newPassword = document.getElementById("reset_newpassword").value;
     var code = document.getElementById("reset_code").value;
 
-    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+    var userPool = new AWSCognito.CognitoUserPool(poolData);
     var userData = {
         Username : username,
         Pool : userPool
     };
-    var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+    var cognitoUser = new AWSCognito.CognitoUser(userData);
     cognitoUser.confirmPassword(code, newPassword, {
       onFailure(err) {
         console.log(err);
@@ -203,3 +223,18 @@ $(document).ready(function() {
         alert(result);
     });    
   }
+
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.hash.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};

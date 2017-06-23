@@ -1,10 +1,10 @@
 let apigClientFactory = require('aws-api-gateway-client').default;
-let secrets = require('./secrets');
+let Secrets = require('./secret').Secrets;
 
 function sendToAPIGateway(data){
     console.log(data.Credentials);
     let credentials = {
-        invokeUrl: secrets.aws_api_url,
+        invokeUrl: Secrets.aws_api_url,
         accessKey: data.Credentials.AccessKeyId,
         secretKey: data.Credentials.SecretKey,
         sessionToken: data.Credentials.SessionToken

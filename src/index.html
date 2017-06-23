@@ -9,12 +9,12 @@
   <label for="signup_username">Username: </label><input id="signup_username" type="text"></input>
   <label for="signup_password">Password: </label><input id="signup_password" type="text"></input>
   <label for="signup_email">E-Mail: </label><input id="signup_email" type="text"></input>
-  <button onClick="signUp()">Sign Up</button>
+  <button id="awsSignupBtn">Sign Up</button>
   <p>
   <div>step2: email verify</div>
   <label for="verificate_username">Username: </label><input id="verificate_username" type="text"></input>
   <label for="verificate_code">verify Code: </label><input id="verificate_code" type="text"></input>
-  <button onClick="verify()">Verify</button>
+  <button id="awsVerifyBtn">Verify</button>
   <p>
   <div id="aws_login_div">
     <div>step3: singn in</div>
@@ -29,7 +29,7 @@
   <label for="reset_username">Username: </label><input id="reset_username" type="text"></input>
   <label for="reset_newpassword">New Password: </label><input id="reset_newpassword" type="text"></input>
   <label for="reset_code">verify Code: </label><input id="reset_code" type="text"></input>
-  <button onClick="confirmPassword()">confirmPassword</button>
+  <button id="awsForgetBtn">confirmPassword</button>
   <p>
   <div>step4: use resources</div>
   <label for="api">API: </label><input id="api" type="text" style="width:500px"></input>
@@ -38,7 +38,7 @@
   <button onClick="deleteUser()">deleteUser</button>
 
   <p>
-  <button onClick="oauthSignIn()">Google OAuth</button>
+  <button id="googleOauthBtn">Google OAuth</button>
   <div>Information:</div>
   <div id="accessToken"></div>
   <div id="idToken"></div>

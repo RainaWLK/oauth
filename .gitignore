@@ -3,5 +3,5 @@ node_modules/
 *.log
 build/
 secret.js
-
 www/js/secret.js
+dist/
