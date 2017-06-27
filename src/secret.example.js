@@ -1,11 +1,10 @@
-let upload_site = "";
-let cognito_user_pool_id = "";
-let congito_client_id = '';
-let aws_identity_pool_id = '';
-let aws_account_id = "";
 
 let secrets = {
-    aws_api_url: ""
+    api_baseurl: '',
+    region: 'us-east-1',
+    cognito_user_pool_id: "us-east-1_xxxxxxxxxxx",
+    congito_client_id: '',    //cognito app client id
+    aws_identity_pool_id: 'us-east-1:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx'  //federate identity pool
 }
 
-exports.secrets = secrets;
+exports.Secrets = secrets;

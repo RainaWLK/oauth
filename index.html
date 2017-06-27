@@ -1,7 +1,7 @@
 <html>
   <head>
     <title>OAuth and Cognito</title>
-    <script src="bundle.js"></script>
+    <script src="dist/bundle.js"></script>
   </head>
   <body>
 
@@ -21,31 +21,37 @@
     <label for="username">Username: </label><input id="username" type="text"></input>
     <label for="password">Password: </label><input id="password" type="text"></input>
     <button class="btn btn-default" id="awsLoginBtn">AWS Login</button>
-    <div>Identity ID=<span id="identity_id"></span><div>
+    <div>Identity ID=<span id="identity_id"></span></div>
   </div>
 
   <p>
-  <div>step3.5: confirm password</div>
+  <!--<div>step3.5: confirm password</div>
   <label for="reset_username">Username: </label><input id="reset_username" type="text"></input>
   <label for="reset_newpassword">New Password: </label><input id="reset_newpassword" type="text"></input>
   <label for="reset_code">verify Code: </label><input id="reset_code" type="text"></input>
-  <button id="awsForgetBtn">confirmPassword</button>
+  <button id="awsForgetBtn">confirmPassword</button>-->
   <p>
   <div>step4: use resources</div>
   <label for="api">API: </label><input id="api" type="text" style="width:500px"></input>
-  <button onClick="callResource()">Call</button>
+  <button id="callResource">Call</button>
   <p>
-  <button onClick="deleteUser()">deleteUser</button>
+  <!--<button onClick="deleteUser()">deleteUser</button>-->
 
   <p>
   <button id="googleOauthBtn">Google OAuth</button>
-  <div>Information:</div>
+  <button id="oauthCredentialBtn">Get AWS Credentials</button>
+  <div style="font-size:16pt;font-weight:bold">Information:</div>
+  <div style="font-size:12pt;color:blue">accessToken:</div>
   <div id="accessToken"></div>
+  <div style="font-size:12pt;color:blue">id_token:</div>
   <div id="idToken"></div>
+  <div style="font-size:12pt;color:blue">id_token detail:</div>
+  <div id="idToken_jwt"></div>
+  <div style="font-size:12pt;color:blue">aws credentials:</div>
+  <div id="aws_credential_div"></div>
 
-
-
-  <div id="aws_credential_div">
-  </div>
+  <p>
+  <div>REST API result:</div>
+  <div id="rest_result"></div>
   </body>
 </html>

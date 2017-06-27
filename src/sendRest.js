@@ -1,27 +1,24 @@
 let apigClientFactory = require('aws-api-gateway-client').default;
 let Secrets = require('./secret').Secrets;
 
-function sendToAPIGateway(data){
-    console.log(data.Credentials);
-    let credentials = {
-        invokeUrl: Secrets.aws_api_url,
-        accessKey: data.Credentials.AccessKeyId,
-        secretKey: data.Credentials.SecretKey,
-        sessionToken: data.Credentials.SessionToken
+function sendToAPIGateway(credentials, method, uri){
+    console.log(credentials.data.Credentials);
+    let credentialObj = {
+        invokeUrl: Secrets.api_baseurl,
+        accessKey: credentials.data.Credentials.AccessKeyId,
+        secretKey: credentials.data.Credentials.SecretKey,
+        sessionToken: credentials.data.Credentials.SessionToken
     };
-    console.log(apigClientFactory);
-    var apigClient = apigClientFactory.newClient(credentials);
+    let apigClient = apigClientFactory.newClient(credentialObj);
 
-    var pathTemplate = '/restaurants';
-    var method = 'GET';
-    var params = {
+    let params = {
         // This is where any modeled request parameters should be added.
         // The key is the parameter name, as it is defined in the API in API Gateway.
     };
 
-    var body = {};
+    let body = {};
 
-    var additionalParams = {
+    let additionalParams = {
         // If there are any unmodeled query parameters or headers that must be
         //   sent with the request, add them here.
         headers: {
@@ -30,16 +27,18 @@ function sendToAPIGateway(data){
         queryParams: {}
     };
 
-    apigClient.invokeApi(params, pathTemplate, method, additionalParams, body)
-    .then(function(result){
-        console.log(result);
-        //This is where you would put a success callback
-    }).catch( function(result){
-        console.log(result);
-        //This is where you would put an error callback
+    return new Promise((resolve, reject) => {
+        apigClient.invokeApi(params, uri, method, additionalParams, body)
+        .then(result => {       
+            //This is where you would put a success callback
+            console.log("apigClient success");
+            resolve(result);
+        }).catch(err => {
+            //This is where you would put an error callback
+            console.log("apigClient fail");
+            reject(err);
+        });
     });
 }
 
-//var qq = sendToAPIGateway;
-console.log("qq");
 exports.sendToAPIGateway = sendToAPIGateway;
