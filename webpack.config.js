@@ -5,7 +5,7 @@ module.exports = {
   entry: ['babel-polyfill', './index.js'],
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dest')
   },
   module: {
     rules: [
@@ -28,7 +28,7 @@ module.exports = {
     ]
   },
   devServer: {
-    publicPath: "/dist",
+    publicPath: "/dest",
     contentBase: path.join(__dirname, "/"),
     //hot:true,
     headers: {
