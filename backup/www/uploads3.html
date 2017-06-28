@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>MyUpload</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script type="text/javascript" charset="utf-8" src="js/secret.js"></script>
+  <script type="text/javascript">
+    //
+    // initialize
+    var UPLOAD_SITE = upload_site;
+
+    function Init() {
+      var fileselect = document.getElementById("fileselect");
+      var filedrag = document.getElementById("filedrag");
+      var submitbutton = document.getElementById("submitbutton");
+
+      // file select
+      fileselect.addEventListener("change", FileSelectHandler, false);
+
+      // is XHR2 available?
+      var xhr = new XMLHttpRequest();
+      if (xhr.upload) {
+      
+        // file drop
+        //filedrag.addEventListener("dragover", FileDragHover, false);
+        //filedrag.addEventListener("dragleave", FileDragHover, false);
+        //filedrag.addEventListener("drop", FileSelectHandler, false);
+        //filedrag.style.display = "block";
+        
+        // remove submit button
+        //submitbutton.style.display = "none";
+      }
+
+    }
+	function _arrayBufferToBase64( buffer ) {
+		var binary = '';
+		var bytes = new Uint8Array( buffer );
+		var len = bytes.byteLength;
+		for (var i = 0; i < len; i++) {
+			binary += String.fromCharCode( bytes[ i ] );
+		}
+		return window.btoa( binary );
+	}
+	
+	function bufferToBase64(buf) {
+		console.log(buf.byteLength);
+		var binstr = Array.prototype.map.call(buf, function (ch) {
+			return String.fromCharCode(ch);
+		}).join('');
+		console.log(binstr);
+		return btoa(binstr);
+	}
+
+    function FileSelectHandler(e) {
+      // cancel event and hover styling
+      //FileDragHover(e);
+
+      // fetch FileList object
+      var files = e.target.files || e.dataTransfer.files;
+
+      // process all File objects
+      for (var i = 0, f; f = files[i]; i++) {
+        ParseFile(f);
+        UploadFile(f);
+      }
+
+    }
+
+    // upload JPEG files
+    function UploadFile(file) {
+      console.log("UploadFile");
+      var xhr = new XMLHttpRequest();
+      if (xhr.upload && 
+      (file.type == "image/jpeg" || file.type == "image/png")) {
+        //var path = UPLOAD_SITE + file.name + ".json";
+        var path = UPLOAD_SITE;
+
+        // start upload
+        xhr.open("POST", path, true);
+        //xhr.setRequestHeader("Content-Type", "application/octet-stream");
+	xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.setRequestHeader("Authorization", "");
+		
+		var reader = new FileReader();
+
+		reader.onload = function(e) {
+		  var arrayBuffer = reader.result;
+		  
+		  var output = {
+			"image": _arrayBufferToBase64(arrayBuffer),
+			"title": "pomerinan",
+			"desc": "cute pomerinan"
+		  }
+		  console.log(output);
+		   xhr.send(JSON.stringify(output));
+		}
+
+		reader.readAsArrayBuffer(file);
+      }
+
+    }
+
+    // output file information
+    function ParseFile(file) {
+      console.log("File information: " + file.name);
+      console.log("type: " + file.type);
+      console.log("size: " + file.size);
+    }
+
+  </script>
+</head>
+<body onload="Init()">
+
+  <fieldset>
+  <legend>HTML File Upload</legend>
+
+  <div>
+    <label for="fileselect">Files to upload:</label>
+    <input type="file" id="fileselect" name="fileselect[]" multiple="multiple" />
+    <!--<div id="filedrag">or drop files here</div>-->
+  </div>
+
+  <!--<div id="submitbutton">
+    <button type="submit">Upload Files</button>
+  </div>-->
+
+  </fieldset>
+
+</body>
+</html>
