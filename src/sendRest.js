@@ -1,5 +1,5 @@
 let apigClientFactory = require('aws-api-gateway-client').default;
-let Secrets = require('./secret').Secrets;
+let Secrets = require('./secret').b2bSecrets;
 
 function sendToAPIGateway(credentials, method, uri){
     console.log(credentials.data.Credentials);

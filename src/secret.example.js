@@ -1,5 +1,5 @@
 
-let secrets = {
+let b2bSecrets = {
     api_baseurl: '',
     region: 'us-east-1',
     cognito_user_pool_id: "us-east-1_xxxxxxxxxxx",
@@ -7,4 +7,11 @@ let secrets = {
     aws_identity_pool_id: 'us-east-1:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx'  //federate identity pool
 }
 
-exports.Secrets = secrets;
+let b2cSecrets = {
+    api_baseurl: '',
+    region: 'us-east-1',
+    aws_identity_pool_id: 'us-east-1:xxxxxxxx-xxxx-xxxx-xxxx-yyyyyyyyyy'  //federate identity pool  
+}
+
+exports.b2bSecrets = b2bSecrets;
+exports.b2cSecrets = b2cSecrets;

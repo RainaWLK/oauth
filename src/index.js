@@ -1,19 +1,19 @@
 import $ from 'jquery';
 import AWS from 'aws-sdk';
+import _ from 'lodash';
 var AWSCognito = require('amazon-cognito-identity-js');
-let Secrets = require('./secret').Secrets;
 let SendRest = require('./sendRest');
 let AWS_LOGIN = require('./aws_login');
 import Google from './google_implicit';
 
-let id_token;
+//let id_token;
 
 $(document).ready(function() {
     var googletoken = getUrlParameter(window.location.href);
 
-    if($.isEmptyObject(googletoken) == false){
+    if(_.isEmpty(googletoken) == false){
       let id_token_jwt = parseJwt(googletoken.id_token);
-      id_token = googletoken.id_token;
+      Google.id_token = googletoken.id_token;
 
       $("#accessToken").html(googletoken.access_token);
       $("#idToken").html(googletoken.id_token);
@@ -40,8 +40,9 @@ $(document).ready(function() {
       Google.sendImplictRequest();
     });
 
-    $("#oauthCredentialBtn").on("click", function(){
-      googleSignIn();
+    $("#oauthCredentialBtn").on("click", async () => {
+      let credentials = await Google.signIn_aws();
+      showCredentials(credentials);
     });
 
     $("#callResource").on("click", async function(){
@@ -107,12 +108,6 @@ async function signIn(){
   catch(err) {
     alert(err);
   }
-}
-
-async function googleSignIn(){
-  let credentials = await AWS_LOGIN.registerFederateIdentityPool('accounts.google.com', id_token);
-
-  showCredentials(credentials.data);
 }
 
 function showCredentials(data){

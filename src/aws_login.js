@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
 let AWSCognito = require('amazon-cognito-identity-js');
-let Secrets = require('./secret').Secrets;
+let Secrets = require('./secret').b2bSecrets;
 
 let poolData = {
     UserPoolId : Secrets.cognito_user_pool_id, // your user pool id here
@@ -82,7 +82,7 @@ function signIn(username, password) {
                 //step2: Integrate into federate identity
                 let idp = 'cognito-idp.us-east-1.amazonaws.com/'+ Secrets.cognito_user_pool_id;
                 try{
-                    let credentals = await registerFederateIdentityPool(idp, id_token);
+                    let credentals = await registerFederateIdentityPool(idp, id_token, Secrets.aws_identity_pool_id);
                     resolve(credentals);
                 }
                 catch(err){
@@ -104,7 +104,7 @@ function signIn(username, password) {
 }
 
 
-function registerFederateIdentityPool(idp, id_token){
+function registerFederateIdentityPool(idp, id_token, identity_pool_id){
     return new Promise((resolve, reject) => {
         //integrate into federate indentity pool
         let logins = {};
@@ -113,7 +113,7 @@ function registerFederateIdentityPool(idp, id_token){
         console.log(logins);
         //AWS.config.credentials.clearCachedId();
         AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-            IdentityPoolId : Secrets.aws_identity_pool_id,
+            IdentityPoolId : identity_pool_id,
             Logins : logins
         });
 
