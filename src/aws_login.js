@@ -1,6 +1,12 @@
 import AWS from 'aws-sdk';
+//require('amazon-cognito-js');
 let AWSCognito = require('amazon-cognito-identity-js');
+let jwt = require('jsonwebtoken');
+
+let CognitoSync = require('./aws_cognito_sync.js');
+let SendRest = require('./sendRest.js');
 let Secrets = require('./secret').b2bSecrets;
+let B2CSecrets = require('./secret').b2cSecrets;
 
 let poolData = {
     UserPoolId : Secrets.cognito_user_pool_id, // your user pool id here
@@ -124,6 +130,10 @@ function registerFederateIdentityPool(idp, id_token, identity_pool_id){
             } else {
                 console.log('Successfully logged!');
                 console.log(AWS.config.credentials);
+
+                //write basic userinfo
+                registerBasicUserInfo(id_token);
+
                 resolve(AWS.config.credentials);
             }
         });
@@ -131,6 +141,17 @@ function registerFederateIdentityPool(idp, id_token, identity_pool_id){
     });
 }
 
+function registerBasicUserInfo(id_token){
+    var id_token_decoded = jwt.decode(id_token);
+
+    let data = {
+        "email": id_token_decoded.email,
+        "name": id_token_decoded.name,
+        "locale": id_token_decoded.locale
+    }
+    let cognitoSync = CognitoSync.cognitoSync("userinfo", data);
+    
+}
 
 /*
 function confirmPassword(){
@@ -173,4 +194,4 @@ exports.signUp = signUp;
 exports.verify = verify;
 exports.signIn = signIn;
 exports.registerFederateIdentityPool = registerFederateIdentityPool;
-//exports.cognitoSync = cognitoSync;
+//exports.registerBasicUserInfo = registerBasicUserInfo;

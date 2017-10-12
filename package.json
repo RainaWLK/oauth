@@ -5,6 +5,7 @@
   "main": "app.js",
   "dependencies": {
     "amazon-cognito-identity-js": "^1.19.0",
+    "amazon-cognito-js": "^1.1.0",
     "aws-api-gateway-client": "^0.2.7",
     "aws-sdk": "^2.75.0",
     "body-parser": "^1.17.2",

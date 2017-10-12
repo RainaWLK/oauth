@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import _ from 'lodash';
 let SendRest = require('./sendRest.js');
-
+let Secrets = require('./secret').b2bSecrets;
 import aws_login_ui from './aws_login_ui.js';
 import google_oauth_ui from './google_oauth_ui.js';
 
@@ -45,7 +45,7 @@ function div_ctrl(){
 async function callResource(){
   try {
     let uri = $("#api").val();
-    let result = await SendRest.sendToAPIGateway(AWS.config.credentials, "GET", uri);
+    let result = await SendRest.sendToAPIGateway(AWS.config.credentials, Secrets.api_baseurl, "GET", uri);
 
     $("#rest_result").html(JSON.stringify(result.data));
   }

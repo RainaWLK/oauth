@@ -32,7 +32,7 @@ module.exports = {
     contentBase: path.join(__dirname, "/"),
     //hot:true,
     headers: {
-      'Access-Control-Allow-Origin': '*'
+      "Access-Control-Allow-Origin": '*'
     },
     proxy: {
       "/oauth2callback": {
