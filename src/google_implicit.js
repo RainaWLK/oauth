@@ -2,7 +2,7 @@ import $ from 'jquery';
 let AWS_LOGIN = require('./aws_login');
 let Secrets = require('./secret').b2cSecrets;
 
-let id_token;
+
 /*
  * Create form to request access token from Google's OAuth 2.0 server.
  */
@@ -11,8 +11,8 @@ function sendImplictRequest() {
   let oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
 
   // Parameters to pass to OAuth 2.0 endpoint.
-  let params = {'client_id': '167755153886-o7qrcglr58l7vakh8sr0iqn2ua9gg52a.apps.googleusercontent.com',
-                'redirect_uri': 'http://127.0.0.1:8080/oauth2callback',
+  let params = {'client_id': Secrets.google_oauth_clientid,
+                'redirect_uri': Secrets.google_oauth_redirecturl,
                 'response_type': 'id_token token',
                 'scope': 'openid profile',
                 'include_granted_scopes': 'true',
@@ -24,11 +24,10 @@ function sendImplictRequest() {
   window.open(oauth2Endpoint+"?"+requestStr, '_blank');
 }
 
-async function signIn_aws(){
+async function signIn_aws(id_token){
   let credentials = await AWS_LOGIN.registerFederateIdentityPool('accounts.google.com', id_token, Secrets.aws_identity_pool_id);
   return credentials.data;
 }
 
 exports.sendImplictRequest = sendImplictRequest;
 exports.signIn_aws = signIn_aws;
-exports.id_token = id_token;

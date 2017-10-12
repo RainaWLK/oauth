@@ -10,7 +10,9 @@ let b2bSecrets = {
 let b2cSecrets = {
     api_baseurl: '',
     region: 'us-east-1',
-    aws_identity_pool_id: 'us-east-1:xxxxxxxx-xxxx-xxxx-xxxx-yyyyyyyyyy'  //federate identity pool  
+    aws_identity_pool_id: 'us-east-1:xxxxxxxx-xxxx-xxxx-xxxx-yyyyyyyyyy',  //federate identity pool
+    google_oauth_redirecturl: '',
+    google_oauth_clientid: ''
 }
 
 exports.b2bSecrets = b2bSecrets;

@@ -131,6 +131,7 @@ function registerFederateIdentityPool(idp, id_token, identity_pool_id){
     });
 }
 
+
 /*
 function confirmPassword(){
     var username = document.getElementById("reset_username").value;
@@ -154,7 +155,22 @@ function confirmPassword(){
 }
 */
 
+function deleteUser() {
+    if(cognitoLoginUser == null)
+      return;
+  
+    cognitoLoginUser.deleteUser(function(err, result) {
+        if (err) {
+            alert(err);
+            return;
+        }
+        console.log('call result: ' + result);
+        alert(result);
+    });    
+  }
+
 exports.signUp = signUp;
 exports.verify = verify;
 exports.signIn = signIn;
 exports.registerFederateIdentityPool = registerFederateIdentityPool;
+//exports.cognitoSync = cognitoSync;

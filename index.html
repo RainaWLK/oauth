@@ -1,57 +1,75 @@
 <html>
   <head>
     <title>OAuth and Cognito</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="index.css">
     <script src="dest/bundle.js"></script>
   </head>
   <body>
+  
+  <h3 id="aws_signup_title" class="stage_div">AWS Cognito Sign Up</h3>
+  <div id="aws_signup_div">  
+    <div>
+      <div>step1: sign up</div>
+      <label for="signup_username">Username: </label><input id="signup_username" type="text"></input>
+      <label for="signup_password">Password: </label><input id="signup_password" type="text"></input>
+      <label for="signup_email">E-Mail: </label><input id="signup_email" type="text"></input>
+      <button id="awsSignupBtn">Sign Up</button>
+    </div>
+    <div>
+      <div>step2: email verify</div>
+      <label for="verificate_username">Username: </label><input id="verificate_username" type="text"></input>
+      <label for="verificate_code">verify Code: </label><input id="verificate_code" type="text"></input>
+      <button id="awsVerifyBtn">Verify</button>
+    </div>
+  </div>
 
-  <div>step1: sign up</div>
-  <label for="signup_username">Username: </label><input id="signup_username" type="text"></input>
-  <label for="signup_password">Password: </label><input id="signup_password" type="text"></input>
-  <label for="signup_email">E-Mail: </label><input id="signup_email" type="text"></input>
-  <button id="awsSignupBtn">Sign Up</button>
-  <p>
-  <div>step2: email verify</div>
-  <label for="verificate_username">Username: </label><input id="verificate_username" type="text"></input>
-  <label for="verificate_code">verify Code: </label><input id="verificate_code" type="text"></input>
-  <button id="awsVerifyBtn">Verify</button>
-  <p>
+  <h3 id="aws_login_title"  class="stage_div">AWS Cognito Login</h3>
   <div id="aws_login_div">
-    <div>step3: singn in</div>
     <label for="username">Username: </label><input id="username" type="text"></input>
     <label for="password">Password: </label><input id="password" type="text"></input>
     <button class="btn btn-default" id="awsLoginBtn">AWS Login</button>
-    <div>Identity ID=<span id="identity_id"></span></div>
+
+    <div id="cognito_info" class="credential_info">
+        <div class="info_title">AWS Identity ID</div>
+        <div id="cognito_identity_id"></div>
+        <div class="info_title">AWS credentials:</div>
+        <div id="aws_cognito_credential_div"></div>
+    </div>
   </div>
 
-  <p>
   <!--<div>step3.5: confirm password</div>
   <label for="reset_username">Username: </label><input id="reset_username" type="text"></input>
   <label for="reset_newpassword">New Password: </label><input id="reset_newpassword" type="text"></input>
   <label for="reset_code">verify Code: </label><input id="reset_code" type="text"></input>
   <button id="awsForgetBtn">confirmPassword</button>-->
-  <p>
-  <div>step4: use resources</div>
-  <label for="api">API: </label><input id="api" type="text" style="width:500px"></input>
-  <button id="callResource">Call</button>
-  <p>
+
   <!--<button onClick="deleteUser()">deleteUser</button>-->
 
-  <p>
-  <button id="googleOauthBtn">Google OAuth</button>
-  <button id="oauthCredentialBtn">Get AWS Credentials</button>
-  <div style="font-size:16pt;font-weight:bold">Information:</div>
-  <div style="font-size:12pt;color:blue">accessToken:</div>
-  <div id="accessToken"></div>
-  <div style="font-size:12pt;color:blue">id_token:</div>
-  <div id="idToken"></div>
-  <div style="font-size:12pt;color:blue">id_token detail:</div>
-  <div id="idToken_jwt"></div>
-  <div style="font-size:12pt;color:blue">aws credentials:</div>
-  <div id="aws_credential_div"></div>
+  <h3 id="b2c_login_title"  class="stage_div">B2C Login</h3>
+  <div id="b2c_login_div">
+    <button id="googleOauthBtn">Google OAuth</button>
+    <!--<button id="oauthCredentialBtn">Get AWS Credentials</button>-->
+    <div id="google_info" class="credential_info">
+      <!--<div class="info_title">Google accessToken:</div>
+      <div id="google_accessToken"></div>-->
+      <div class="info_title">Google id_token:</div>
+      <div id="google_idToken"></div>
+      <div class="info_title">Google id_token detail:</div>
+      <div id="google_idToken_decoded"></div>
+      <div class="info_title">AWS Identity ID</div>
+      <div id="google_aws_identity_id"></div>
+      <div class="info_title">AWS credentials:</div>
+      <div id="google_aws_credential_div"></div>
+    </div>
+  </div>
 
-  <p>
-  <div>REST API result:</div>
-  <div id="rest_result"></div>
+  <h3 id="test_title" class="stage_div">use resources</h3>
+  <div id="test_div">
+    <label for="api">API: </label><input id="api" type="text" style="width:500px"></input>
+    <button id="callResource">Call</button>
+    <div>REST API result:</div>
+    <div id="rest_result"></div>
+  </div>
   </body>
 </html>

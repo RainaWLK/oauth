@@ -1,0 +1,13 @@
+.stage_div {
+  background-color: #B1EAF1;
+}
+
+.credential_info {
+  font-size:12pt;
+  color:blue;
+}
+
+.credential_info > .info_title {
+  color: #575353;
+  background-color: #BFEEBD;
+}
