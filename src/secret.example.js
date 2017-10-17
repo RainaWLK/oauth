@@ -12,7 +12,8 @@ let b2cSecrets = {
     region: 'us-east-1',
     aws_identity_pool_id: 'us-east-1:xxxxxxxx-xxxx-xxxx-xxxx-yyyyyyyyyy',  //federate identity pool
     google_oauth_redirecturl: '',
-    google_oauth_clientid: ''
+    google_oauth_clientid: '',
+    facebook_appid: ''
 }
 
 exports.b2bSecrets = b2bSecrets;

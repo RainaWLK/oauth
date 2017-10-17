@@ -143,14 +143,15 @@ function registerFederateIdentityPool(idp, id_token, identity_pool_id){
 
 function registerBasicUserInfo(id_token){
     var id_token_decoded = jwt.decode(id_token);
-
-    let data = {
-        "email": id_token_decoded.email,
-        "name": id_token_decoded.name,
-        "locale": id_token_decoded.locale
+    console.log(id_token_decoded);
+    if(id_token_decoded !== null){        
+        let data = {
+            "email": id_token_decoded.email,
+            "name": id_token_decoded.name,
+            "locale": id_token_decoded.locale
+        }
+        let cognitoSync = CognitoSync.cognitoSync("userinfo", data);
     }
-    let cognitoSync = CognitoSync.cognitoSync("userinfo", data);
-    
 }
 
 /*

@@ -4,6 +4,7 @@ let SendRest = require('./sendRest.js');
 let Secrets = require('./secret').b2bSecrets;
 import aws_login_ui from './aws_login_ui.js';
 import google_oauth_ui from './google_oauth_ui.js';
+import facebook_ui from './facebook_ui.js';
 
 let id_token;
 
@@ -17,6 +18,8 @@ $(document).ready(function() {
   $("#callResource").on("click", async function(){
     callResource();
   });
+
+  facebook_ui.init();
 });
 
 function div_ctrl(){
