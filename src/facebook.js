@@ -24,9 +24,13 @@ async function statusChangeCallback(response) {
           // Check if the user logged in successfully.
           if (response.authResponse) {
             console.log('You are now logged in.');
+            let me_res = await testAPI();
+            console.log(me_res);
         
             // Add the Facebook access token to the Cognito credentials login map.
-            credentials = await signIn_aws(response.authResponse.accessToken);
+            credentials = await signIn_aws(response.authResponse.accessToken, me_res);
+
+            credentials.personInfo = me_res;
           } else {
             console.log('There was a problem logging you in.');
           }
@@ -41,8 +45,8 @@ async function statusChangeCallback(response) {
 
 }
 
-async function signIn_aws(id_token){
-  let credentials = await AWS_LOGIN.registerFederateIdentityPool('graph.facebook.com', id_token, B2CSecrets.aws_identity_pool_id);
+async function signIn_aws(id_token, personInfo){
+  let credentials = await AWS_LOGIN.registerFederateIdentityPool('graph.facebook.com', id_token, B2CSecrets.aws_identity_pool_id, personInfo);
   
   return credentials.data;
 }
@@ -73,7 +77,7 @@ function logout(){
 function testAPI() {
   console.log('Welcome!  Fetching your information.... ');
   return new Promise((resolve, reject) => {
-    FB.api('/me', function(response) {
+    FB.api('/me?fields=name,email,locale', function(response) {
       console.log('Successful login for: ' + response.name);
       resolve(response);
     });

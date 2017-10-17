@@ -110,7 +110,7 @@ function signIn(username, password) {
 }
 
 
-function registerFederateIdentityPool(idp, id_token, identity_pool_id){
+function registerFederateIdentityPool(idp, id_token, identity_pool_id, personInfo){
     return new Promise((resolve, reject) => {
         //integrate into federate indentity pool
         let logins = {};
@@ -132,7 +132,7 @@ function registerFederateIdentityPool(idp, id_token, identity_pool_id){
                 console.log(AWS.config.credentials);
 
                 //write basic userinfo
-                registerBasicUserInfo(id_token);
+                registerBasicUserInfo(id_token, personInfo);
 
                 resolve(AWS.config.credentials);
             }
@@ -141,17 +141,18 @@ function registerFederateIdentityPool(idp, id_token, identity_pool_id){
     });
 }
 
-function registerBasicUserInfo(id_token){
+function registerBasicUserInfo(id_token, personInfo){
     var id_token_decoded = jwt.decode(id_token);
     console.log(id_token_decoded);
-    if(id_token_decoded !== null){        
-        let data = {
-            "email": id_token_decoded.email,
-            "name": id_token_decoded.name,
-            "locale": id_token_decoded.locale
-        }
-        let cognitoSync = CognitoSync.cognitoSync("userinfo", data);
+    if(id_token_decoded === null){
+        id_token_decoded = personInfo;
     }
+    let data = {
+        "email": id_token_decoded.email,
+        "name": id_token_decoded.name,
+        "locale": id_token_decoded.locale
+    }
+    let cognitoSync = CognitoSync.cognitoSync("userinfo", data);
 }
 
 /*
