@@ -32,8 +32,13 @@ module.exports = {
       }
     ]
   },
+  resolve: {
+    alias: {
+        querystring: 'querystring-browser'
+      }    
+  },
   plugins: [
-    new S3Plugin({
+    /*new S3Plugin({
       include: /.*\.(css|js|html)/,
       // s3Options are required
       s3Options: {
@@ -45,7 +50,7 @@ module.exports = {
         Bucket: 'mesh-dev-site'
       },
       basePath: 'oauth/dest'
-    })
+    })*/
   ],
   devServer: {
     publicPath: "/dest",
