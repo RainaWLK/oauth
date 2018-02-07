@@ -4,4 +4,4 @@ _DS_Store
 build/
 src/secret.js
 www/js/secret.js
-dest/
+dist/
