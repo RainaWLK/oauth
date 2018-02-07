@@ -2,16 +2,20 @@ let path = require('path');
 
 module.exports = {
   context: path.resolve(__dirname, './src'),
-  entry: ['babel-polyfill', './index.js'],
+  entry: {
+    'bundle': ['babel-polyfill', './index.js']
+  },
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dest')
+    filename: '[name].js',
+    path: path.resolve(__dirname, 'dist')
   },
   module: {
     rules: [
       {
         test: /\.js$/,
-        exclude: /(node_modules|bower_components)/,
+        exclude: [
+          /(node_modules|bower_components)/
+        ],
         use: {
           loader: 'babel-loader',
           options: {
@@ -27,12 +31,20 @@ module.exports = {
       }
     ]
   },
+  resolve: {
+    alias: {
+        querystring: 'querystring-browser'
+      }    
+  },
+  plugins: [
+
+  ],
   devServer: {
-    publicPath: "/dest",
+    publicPath: "/dist",
     contentBase: path.join(__dirname, "/"),
     //hot:true,
     headers: {
-      'Access-Control-Allow-Origin': '*'
+      "Access-Control-Allow-Origin": '*'
     },
     proxy: {
       "/oauth2callback": {
@@ -42,4 +54,3 @@ module.exports = {
     }
   }
 }
-

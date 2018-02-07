@@ -1,6 +1,12 @@
 import AWS from 'aws-sdk';
+//require('amazon-cognito-js');
 let AWSCognito = require('amazon-cognito-identity-js');
-let Secrets = require('./secret').Secrets;
+let jwt = require('jsonwebtoken');
+
+let CognitoSync = require('./aws_cognito_sync.js');
+let SendRest = require('./sendRest.js');
+let Secrets = require('./secret').b2bSecrets;
+let B2CSecrets = require('./secret').b2cSecrets;
 
 let poolData = {
     UserPoolId : Secrets.cognito_user_pool_id, // your user pool id here
@@ -80,9 +86,9 @@ function signIn(username, password) {
                 console.log(id_token);
 
                 //step2: Integrate into federate identity
-                let idp = 'cognito-idp.us-east-1.amazonaws.com/'+ Secrets.cognito_user_pool_id;
+                let idp = `cognito-idp.${AWS.config.region}.amazonaws.com/`+ Secrets.cognito_user_pool_id;
                 try{
-                    let credentals = await registerFederateIdentityPool(idp, id_token);
+                    let credentals = await registerFederateIdentityPool(idp, id_token, Secrets.aws_identity_pool_id);
                     resolve(credentals);
                 }
                 catch(err){
@@ -93,18 +99,35 @@ function signIn(username, password) {
             onFailure: function(err) {
                 reject(err);
                 return;
-            }
+            },
             /*mfaRequired: function(codeDeliveryDetails) {
                 var verificationCode = prompt('Please input verification code' ,'');
                 cognitoLoginUser.sendMFACode(verificationCode, this);
             }*/
+
+            newPasswordRequired: function(userAttributes, requiredAttributes) {
+                console.log(userAttributes);
+                console.log(requiredAttributes);
+                // User was signed up by an admin and must provide new
+                // password and required attributes, if any, to complete
+                // authentication.
+                userAttributes.name = 'demo';
+                userAttributes.phone_number = '+212345678';
+
+    
+                // the api doesn't accept this field back
+                delete userAttributes.email_verified;
+    
+                // Get these details and call
+                cognitoLoginUser.completeNewPasswordChallenge('12345678', userAttributes, this);
+            }
         });
     });
 
 }
 
 
-function registerFederateIdentityPool(idp, id_token){
+function registerFederateIdentityPool(idp, id_token, identity_pool_id, personInfo){
     return new Promise((resolve, reject) => {
         //integrate into federate indentity pool
         let logins = {};
@@ -113,7 +136,7 @@ function registerFederateIdentityPool(idp, id_token){
         console.log(logins);
         //AWS.config.credentials.clearCachedId();
         AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-            IdentityPoolId : Secrets.aws_identity_pool_id,
+            IdentityPoolId : identity_pool_id,
             Logins : logins
         });
 
@@ -124,11 +147,29 @@ function registerFederateIdentityPool(idp, id_token){
             } else {
                 console.log('Successfully logged!');
                 console.log(AWS.config.credentials);
+
+                //write basic userinfo
+                registerBasicUserInfo(id_token, personInfo);
+
                 resolve(AWS.config.credentials);
             }
         });
 
     });
+}
+
+function registerBasicUserInfo(id_token, personInfo){
+    var id_token_decoded = jwt.decode(id_token);
+    console.log(id_token_decoded);
+    if(id_token_decoded === null){
+        id_token_decoded = personInfo;
+    }
+    let data = {
+        "email": id_token_decoded.email,
+        "name": id_token_decoded.name,
+        "locale": id_token_decoded.locale
+    }
+    let cognitoSync = CognitoSync.cognitoSync("userinfo", data);
 }
 
 /*
@@ -154,7 +195,22 @@ function confirmPassword(){
 }
 */
 
+function deleteUser() {
+    if(cognitoLoginUser == null)
+      return;
+  
+    cognitoLoginUser.deleteUser(function(err, result) {
+        if (err) {
+            alert(err);
+            return;
+        }
+        console.log('call result: ' + result);
+        alert(result);
+    });    
+  }
+
 exports.signUp = signUp;
 exports.verify = verify;
 exports.signIn = signIn;
 exports.registerFederateIdentityPool = registerFederateIdentityPool;
+//exports.registerBasicUserInfo = registerBasicUserInfo;

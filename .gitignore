@@ -1,6 +1,6 @@
 node_modules/
 _DS_Store
-*.log
+*.log*
 build/
 src/secret.js
 www/js/secret.js
