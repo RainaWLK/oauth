@@ -86,7 +86,7 @@ function signIn(username, password) {
                 console.log(id_token);
 
                 //step2: Integrate into federate identity
-                let idp = 'cognito-idp.us-east-1.amazonaws.com/'+ Secrets.cognito_user_pool_id;
+                let idp = `cognito-idp.${AWS.config.region}.amazonaws.com/`+ Secrets.cognito_user_pool_id;
                 try{
                     let credentals = await registerFederateIdentityPool(idp, id_token, Secrets.aws_identity_pool_id);
                     resolve(credentals);
@@ -99,11 +99,28 @@ function signIn(username, password) {
             onFailure: function(err) {
                 reject(err);
                 return;
-            }
+            },
             /*mfaRequired: function(codeDeliveryDetails) {
                 var verificationCode = prompt('Please input verification code' ,'');
                 cognitoLoginUser.sendMFACode(verificationCode, this);
             }*/
+
+            newPasswordRequired: function(userAttributes, requiredAttributes) {
+                console.log(userAttributes);
+                console.log(requiredAttributes);
+                // User was signed up by an admin and must provide new
+                // password and required attributes, if any, to complete
+                // authentication.
+                userAttributes.name = 'demo';
+                userAttributes.phone_number = '+212345678';
+
+    
+                // the api doesn't accept this field back
+                delete userAttributes.email_verified;
+    
+                // Get these details and call
+                cognitoLoginUser.completeNewPasswordChallenge('12345678', userAttributes, this);
+            }
         });
     });
 
