@@ -31,6 +31,11 @@ module.exports = {
       }
     ]
   },
+  resolve: {
+    alias: {
+        querystring: 'querystring-browser'
+      }    
+  },
   plugins: [
 
   ],
